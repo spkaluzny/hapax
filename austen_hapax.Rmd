@@ -1,5 +1,5 @@
 ---
-title: "Jane Austin Hapax"
+title: "Jane Austen Hapax"
 author: "Stephen Kaluzny"
 output:
   html_document:
@@ -14,8 +14,8 @@ How common are hapaxes in works of literature?
 With access to digital versions of the works,
 finding hapaxes should be a straighforward computational task.
 
-This paper considers hapaxes in the works by the Jane Austin.
-Austin's works are all available from Project Gutenberg
+This paper considers hapaxes in the works by the Jane Austen.
+Austen's works are all available from Project Gutenberg
 (https://en.wikipedia.org/wiki/Project_Gutenberg)
 
 The R CRAN package `gutenburgr` provides an API to works from
@@ -32,44 +32,44 @@ library(tidytext)
 ```
 
 # Data
-Get the works of Jane Austin from Project Gutenberg.
+Get the works of Jane Austen from Project Gutenberg.
 
 ```{r}
-austin_works <- gutenberg_works(author == "Austen, Jane")
+austen_works <- gutenberg_works(author == "Austen, Jane")
 ```
 
 ```{r}
-nrow(austin_works)
-names(austin_works)
-austin_works[["title"]]
+nrow(austen_works)
+names(austen_works)
+austen_works[["title"]]
 ```
 
-Only look at individual Austin's novels:
+Only look at individual Austen's novels:
 
 ```{r only_novels}
-austin_works <- austin_works[-c(9:10),]
-austin_works[["title"]]
+austen_works <- austen_works[-c(9:10),]
+austen_works[["title"]]
 ```
 
 ```{r download, eval=FALSE}
-austin_books <- gutenberg_download(austin_works[["gutenberg_id"]],
+austen_books <- gutenberg_download(austen_works[["gutenberg_id"]],
   meta_fields="title")
 ```
 
 ```{r load_or_download, echo=FALSE}
-if(file.exists(here::here("data", "austin_books.rds"))) {
-  austin_books <- readRDS(here::here("data", "austin_books.rds"))
+if(file.exists(here::here("data", "austen_books.rds"))) {
+  austen_books <- readRDS(here::here("data", "austen_books.rds"))
 } else {
-  austin_books <- gutenberg_download(austin_works[["gutenberg_id"]],
+  austen_books <- gutenberg_download(austen_works[["gutenberg_id"]],
     meta_fields="title")
-  saveRDS(austin_books, here::here("data", "austin_books.rds"))
+  saveRDS(austen_books, here::here("data", "austen_books.rds"))
 }
 ```
 
 ```{r}
-nrow(austin_books)
-names(austin_books)
-austin_books
+nrow(austen_books)
+names(austen_books)
+austen_books
 ```
 
 # Word Analysis
@@ -79,7 +79,7 @@ drop any formatting characters (e.g. \_) around the words.
 This produces a `tibble` with each observation (row)
 containg the book title and the word.
 ```{r words}
-words <- austin_books |>
+words <- austen_books |>
   unnest_tokens(word, text) |>
   mutate(word = stringr::str_extract(word, "[a-z']+"))
 ```
@@ -120,9 +120,9 @@ book_hapax_words |> group_by(title) |>
   summarise(Nhapax = n())
 ```
 
-## Hapax for All Austin Works
+## Hapax for All Austen Works
 
-Hapax for all Austin works.
+Hapax for all Austen works.
 ```{r hapax_all_works}
 works_hapax_words <- words |>
   anti_join(stop_words, by="word") |>
