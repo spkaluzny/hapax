@@ -1,0 +1,136 @@
+---
+title: "Jane Austin Hapax"
+author: "Stephen Kaluzny"
+output:
+  html_document:
+    theme: cerulean
+---
+# Introduction
+A _hapax_ is (or _hapax legomenon_) is a word that only occurs once in
+a work or collection of works.
+See https://en.wikipedia.org/wiki/Hapax_legomenon
+
+How common are hapaxes in works of literature?
+With access to digital versions of the works,
+finding hapaxes should be a straighforward computational task.
+
+This paper considers hapaxes in the works by the Jane Austin.
+Austin's works are all available from Project Gutenberg
+(https://en.wikipedia.org/wiki/Project_Gutenberg)
+
+The R CRAN package `gutenburgr` provides an API to works from
+Project Gutenberg.
+The R CRAN package `tidytext` provides functions to process the text.
+
+## Setup
+
+The packages we use.
+```{r}
+library(dplyr, quietly=TRUE, warn.conflicts=FALSE)
+library(gutenbergr)
+library(tidytext)
+```
+
+# Data
+Get the works of Jane Austin from Project Gutenberg.
+
+```{r}
+austin_works <- gutenberg_works(author == "Austen, Jane")
+```
+
+```{r}
+nrow(austin_works)
+names(austin_works)
+austin_works[["title"]]
+```
+
+Only look at individual Austin's novels:
+
+```{r only_novels}
+austin_works <- austin_works[-c(9:10),]
+austin_works[["title"]]
+```
+
+```{r download, eval=FALSE}
+austin_books <- gutenberg_download(austin_works[["gutenberg_id"]],
+  meta_fields="title")
+```
+
+```{r load_or_download, echo=FALSE}
+if(file.exists(here::here("data", "austin_books.rds"))) {
+  austin_books <- readRDS(here::here("data", "austin_books.rds"))
+} else {
+  austin_books <- gutenberg_download(austin_works[["gutenberg_id"]],
+    meta_fields="title")
+  saveRDS(austin_books, here::here("data", "austin_books.rds"))
+}
+```
+
+```{r}
+nrow(austin_books)
+names(austin_books)
+austin_books
+```
+
+# Word Analysis
+
+Get words in each book,
+drop any formatting characters (e.g. \_) around the words.
+This produces a `tibble` with each observation (row)
+containg the book title and the word.
+```{r words}
+words <- austin_books |>
+  unnest_tokens(word, text) |>
+  mutate(word = stringr::str_extract(word, "[a-z']+"))
+```
+
+```{r}
+nrow(words)
+words
+```
+
+Count words per book, dropping "stop" words first.
+```{r count_words}
+book_word_counts <- words |>
+  anti_join(stop_words, by="word") |>
+  count(title, word, sort=TRUE)
+```
+
+```{r}
+book_word_counts
+```
+
+## Hapax in Each Book
+
+Hapax (count == 1) words by book:
+```{r rare_words}
+book_hapax_words <- book_word_counts |>
+  filter(n == 1) |>
+  arrange(word)
+```
+
+```{r}
+nrow(book_hapax_words)
+book_hapax_words
+```
+  
+Number of hapax per book.
+```{r hapax_per_book}
+book_hapax_words |> group_by(title) |>
+  summarise(Nhapax = n())
+```
+
+## Hapax for All Austin Works
+
+Hapax for all Austin works.
+```{r hapax_all_works}
+works_hapax_words <- words |>
+  anti_join(stop_words, by="word") |>
+  count(word, sort=TRUE) |>
+  filter(n < 2)
+```
+
+```{r}
+nrow(works_hapax_words)
+works_hapax_words
+```
