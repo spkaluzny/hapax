@@ -53,7 +53,8 @@ austen_works[["title"]]
 
 ```{r download, eval=FALSE}
 austen_books <- gutenberg_download(austen_works[["gutenberg_id"]],
-  meta_fields="title")
+  meta_fields="title",
+  mirror="http://mirrors.xmission.com/gutenberg/")
 ```
 
 ```{r load_or_download, echo=FALSE}
@@ -61,7 +62,8 @@ if(file.exists(here::here("data", "austen_books.rds"))) {
   austen_books <- readRDS(here::here("data", "austen_books.rds"))
 } else {
   austen_books <- gutenberg_download(austen_works[["gutenberg_id"]],
-    meta_fields="title")
+    meta_fields="title",
+    mirror="http://mirrors.xmission.com/gutenberg/")
   saveRDS(austen_books, here::here("data", "austen_books.rds"))
 }
 ```
