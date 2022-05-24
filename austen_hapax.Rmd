@@ -124,12 +124,12 @@ Number of hapax per book.
 book_hapax_words |> group_by(title) |>
   summarise(Nhapax = n()) |>
   arrange(desc(Nhapax)) |>
-  ggplot(aes(x=factor(title, levels=title), y=Nhapax)) +
-    geom_bar(stat="identity") +
-    coord_flip() +
-    ggtitle("Number of Hapax in Each Austen Novel") +
-    ylab("Number of Hapax") +
-    xlab("Title")
+  ggplot(aes(y=factor(title, levels=title), x=Nhapax)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=Nhapax, y=title, yend=title)) +
+    ggtitle("Number of Hapaxes in Each Austen Novel") +
+    ylab("Title") +
+    xlab("Number of Hapaxes")
 ```
 
 ## Hapax for All Austen Works
@@ -143,6 +143,12 @@ works_hapax_words <- words |>
 ```
 
 ```{r}
+# Number of hapaxes for all of Austen works
 nrow(works_hapax_words)
-works_hapax_words
+```
+
+A sample of hapaxes across all of Austen's works:from Austen's works:
+```{r sample_hapaxes}
+set.seed(42)
+sample(works_hapax_words[["word"]], 50)
 ```
