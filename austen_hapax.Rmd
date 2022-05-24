@@ -1,8 +1,10 @@
 ---
 title: "Jane Austen Hapax"
 author: "Stephen Kaluzny"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
+    keep_md: yes
     theme: cerulean
 ---
 # Introduction
@@ -27,6 +29,7 @@ The R CRAN package `tidytext` provides functions to process the text.
 The packages we use.
 ```{r}
 library(dplyr, quietly=TRUE, warn.conflicts=FALSE)
+library(ggplot2, quietly=TRUE, warn.conflicts=FALSE)
 library(gutenbergr)
 library(tidytext)
 ```
@@ -119,7 +122,14 @@ book_hapax_words
 Number of hapax per book.
 ```{r hapax_per_book}
 book_hapax_words |> group_by(title) |>
-  summarise(Nhapax = n())
+  summarise(Nhapax = n()) |>
+  arrange(desc(Nhapax)) |>
+  ggplot(aes(x=factor(title, levels=title), y=Nhapax)) +
+    geom_bar(stat="identity") +
+    coord_flip() +
+    ggtitle("Number of Hapax in Each Austen Novel") +
+    ylab("Number of Hapax") +
+    xlab("Title")
 ```
 
 ## Hapax for All Austen Works
