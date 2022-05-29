@@ -1,0 +1,159 @@
+---
+title: "Charles Dickens Hapax"
+author: "Stephen Kaluzny"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    keep_md: yes
+    theme: cerulean
+---
+# Introduction
+A _hapax_ is (or _hapax legomenon_) is a word that only occurs once in
+a work or collection of works.
+See https://en.wikipedia.org/wiki/Hapax_legomenon
+
+How common are hapaxes in works of literature?
+With access to digital versions of the works,
+finding hapaxes should be a straighforward computational task.
+
+This paper considers hapaxes in the works by the Charles Dickens.
+Dickens's works are all available from Project Gutenberg
+(https://en.wikipedia.org/wiki/Project_Gutenberg)
+
+The R CRAN package `gutenburgr` provides an API to works from
+Project Gutenberg.
+The R CRAN package `tidytext` provides functions to process the text.
+
+## Setup
+
+The packages we use.
+```{r}
+library(dplyr, quietly=TRUE, warn.conflicts=FALSE)
+library(ggplot2, quietly=TRUE, warn.conflicts=FALSE)
+library(gutenbergr)
+library(tidytext)
+```
+
+# Data
+Get the works of Charles Dickens from Project Gutenberg.
+
+```{r}
+dickens_works <- gutenberg_works(author == "Dickens, Charles")
+```
+
+Novels by Dickens (from Wikipedia):
+```{r novels}
+dickens_novel_titles <- scan(here::here("data", "dickens_novels.txt"),
+  what="", sep="\n")
+```
+
+Novels from Project Gutenberg.
+```{r}
+indx_novels <- match(dickens_novel_titles, dickens_works[["title"]])
+missing_novels <- dickens_novel_titles[is.na(indx_novels)]
+indx_novels <- indx_novels[!is.na(indx_novels)]
+indx_missing <- sapply(missing_novels,
+  function(x) grep(x, dickens_works[["title"]]))
+indx_novels <- c(indx_novels, indx_missing)
+dickens_works[indx_novels, "title"]
+```
+
+Download Dickens novels from Project Gutenberg.
+```{r download, eval=FALSE}
+dickens_books <- gutenberg_download(dickens_works[indx_novels, "gutenberg_id"],
+  meta_fields="title",
+  mirror="http://mirrors.xmission.com/gutenberg/")
+```
+
+```{r load_or_download, echo=FALSE}
+if(file.exists(here::here("data", "dickens_books.rds"))) {
+  dickens_books <- readRDS(here::here("data", "dickens_books.rds"))
+} else {
+dickens_books <- gutenberg_download(dickens_works[indx_novels, "gutenberg_id"],
+  meta_fields="title",
+  mirror="http://mirrors.xmission.com/gutenberg/")
+  saveRDS(dickens_books, here::here("data", "dickens_books.rds"))
+}
+```
+
+```{r}
+nrow(dickens_books)
+names(dickens_books)
+dickens_books
+```
+
+# Word Analysis
+
+Get words in each book,
+drop any formatting characters (e.g. \_) around the words.
+This produces a `tibble` with each observation (row)
+containg the book title and the word.
+```{r words}
+words <- dickens_books |>
+  unnest_tokens(word, text) |>
+  mutate(word = stringr::str_extract(word, "[a-z']+"))
+```
+
+```{r}
+nrow(words)
+words
+```
+
+Count words per book, dropping "stop" words first.
+```{r count_words}
+book_word_counts <- words |>
+  anti_join(stop_words, by="word") |>
+  count(title, word, sort=TRUE)
+```
+
+```{r}
+book_word_counts
+```
+
+## Hapax in Each Book
+
+Hapax (count == 1) words by book:
+```{r rare_words}
+book_hapax_words <- book_word_counts |>
+  filter(n == 1) |>
+  arrange(word)
+```
+
+```{r}
+nrow(book_hapax_words)
+book_hapax_words
+```
+  
+Number of hapax per book.
+```{r hapax_per_book}
+book_hapax_words |> group_by(title) |>
+  summarise(Nhapax = n()) |>
+  arrange(desc(Nhapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=Nhapax)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=Nhapax, y=title, yend=title)) +
+    ggtitle("Number of Hapaxes in Each Dickens Novel") +
+    ylab("Title") +
+    xlab("Number of Hapaxes")
+```
+
+## Hapax for All Dickens Works
+
+Hapax for all Dickens works.
+```{r hapax_all_works}
+works_hapax_words <- words |>
+  anti_join(stop_words, by="word") |>
+  count(word, sort=TRUE) |>
+  filter(n < 2)
+```
+
+```{r}
+# Number of hapaxes for all of Dickens works
+nrow(works_hapax_words)
+```
+
+A sample of hapaxes across all of Dickens's works:from Dickens's works:
+```{r sample_hapaxes}
+set.seed(42)
+sample(works_hapax_words[["word"]], 50)
+```
