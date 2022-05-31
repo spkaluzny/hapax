@@ -1,7 +1,7 @@
 ---
 title: "Jane Austen Hapax"
 author: "Stephen Kaluzny"
-date: "24 May, 2022"
+date: "30 May, 2022"
 output:
   html_document:
     keep_md: yes
@@ -212,6 +212,32 @@ book_word_counts
 ##  9 Northanger Abbey      catherine   487
 ## 10 Persuasion            anne        447
 ## # … with 42,316 more rows
+```
+## Words Per Book
+
+```r
+words_per_book <- book_word_counts |>
+  group_by(title) |>
+  summarise(total_words = sum(n), unique_words = length(word))
+```
+
+
+```r
+words_per_book
+```
+
+```
+## # A tibble: 8 × 3
+##   title                     total_words unique_words
+##   <chr>                           <int>        <int>
+## 1 Emma                            46549         6565
+## 2 Lady Susan                       7157         2495
+## 3 Love and Freindship [sic]       11209         3718
+## 4 Mansfield Park                  47466         7220
+## 5 Northanger Abbey                23816         5495
+## 6 Persuasion                      25487         5303
+## 7 Pride and Prejudice             37010         5736
+## 8 Sense and Sensibility           36388         5794
 ```
 
 ## Hapax in Each Book

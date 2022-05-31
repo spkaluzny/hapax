@@ -104,6 +104,16 @@ book_word_counts <- words |>
 ```{r}
 book_word_counts
 ```
+## Words Per Book
+```{r}
+words_per_book <- book_word_counts |>
+  group_by(title) |>
+  summarise(total_words = sum(n), unique_words = length(word))
+```
+
+```{r}
+words_per_book
+```
 
 ## Hapax in Each Book
 
