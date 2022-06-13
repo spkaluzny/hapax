@@ -1,7 +1,7 @@
 ---
 title: "Jane Austen Hapax"
 author: "Stephen Kaluzny"
-date: "30 May, 2022"
+date: "03 June, 2022"
 output:
   html_document:
     keep_md: yes
@@ -280,15 +280,44 @@ book_hapax_words
 ## # … with 18,763 more rows
 ```
   
-Number of hapax per book.
+Number of hapaxes per book,
+combined with total number of words and number of unique words.
+
+
+```r
+book_hapax_words <- book_hapax_words |> group_by(title) |>
+  summarise(n_hapax = n()) |>
+  ungroup() |>
+  left_join(words_per_book, by="title") |>
+  mutate(percent_hapax_total = n_hapax / total_words * 100,
+    percent_hapax_unique = n_hapax / unique_words * 100)
+```
+
+```r
+knitr::kable(book_hapax_words, format.args=list(digits = 4))
+```
+
+
+
+|title                     | n_hapax| total_words| unique_words| percent_hapax_total| percent_hapax_unique|
+|:-------------------------|-------:|-----------:|------------:|-------------------:|--------------------:|
+|Emma                      |    2707|       46549|         6565|               5.815|                41.23|
+|Lady Susan                |    1410|        7157|         2495|              19.701|                56.51|
+|Love and Freindship [sic] |    1965|       11209|         3718|              17.531|                52.85|
+|Mansfield Park            |    2966|       47466|         7220|               6.249|                41.08|
+|Northanger Abbey          |    2577|       23816|         5495|              10.820|                46.90|
+|Persuasion                |    2482|       25487|         5303|               9.738|                46.80|
+|Pride and Prejudice       |    2326|       37010|         5736|               6.285|                40.55|
+|Sense and Sensibility     |    2340|       36388|         5794|               6.431|                40.39|
+
 
 ```r
 book_hapax_words |> group_by(title) |>
-  summarise(Nhapax = n()) |>
-  arrange(desc(Nhapax)) |>
-  ggplot(aes(y=factor(title, levels=title), x=Nhapax)) +
+  summarise(n_hapax = n()) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=n_hapax)) +
     geom_point() +
-    geom_segment(aes(x=0, xend=Nhapax, y=title, yend=title)) +
+    geom_segment(aes(x=0, xend=n_hapax, y=title, yend=title)) +
     ggtitle("Number of Hapaxes in Each Austen Novel") +
     ylab("Title") +
     xlab("Number of Hapaxes")

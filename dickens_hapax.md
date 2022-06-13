@@ -1,7 +1,7 @@
 ---
 title: "Charles Dickens Hapax"
 author: "Stephen Kaluzny"
-date: "29 May, 2022"
+date: "06 June, 2022"
 output:
   html_document:
     keep_md: yes
@@ -209,6 +209,45 @@ book_word_counts
 ## # … with 204,229 more rows
 ```
 
+## Words Per Book
+
+```r
+words_per_book <- book_word_counts |>
+  group_by(title) |>
+  summarise(total_words = sum(n), unique_words = length(word))
+```
+
+
+```r
+words_per_book
+```
+
+```
+## # A tibble: 20 × 3
+##    title                                                total_words unique_words
+##    <chr>                                                      <int>        <int>
+##  1 "A Christmas Carol"                                        10162         3917
+##  2 "A Tale of Two Cities"                                     46288         9132
+##  3 "Barnaby Rudge: A Tale of the Riots of 'Eighty"            87155        12467
+##  4 "Bleak House"                                             111535        14656
+##  5 "David Copperfield"                                       108448        13636
+##  6 "Dombey and Son"                                          122150        14441
+##  7 "Great Expectations"                                       56130        10183
+##  8 "Hard Times"                                               33740         8194
+##  9 "Little Dorrit"                                           107682        14411
+## 10 "Martin Chuzzlewit"                                       111748        15046
+## 11 "Nicholas Nickleby"                                       113185        14306
+## 12 "Oliver Twist"                                             56255         9578
+## 13 "Our Mutual Friend"                                       108349        14316
+## 14 "The Battle of Life. A Love Story"                         10552         3872
+## 15 "The Chimes\r\nA Goblin Story of Some Bells That Ra…       10355         3728
+## 16 "The Cricket on the Hearth"                                10679         3904
+## 17 "The Haunted Man and the Ghost's Bargain"                  10757         3847
+## 18 "The Mystery of Edwin Drood"                               32654         8647
+## 19 "The Old Curiosity Shop"                                   73959        11406
+## 20 "The Pickwick Papers"                                     114235        14552
+```
+
 ## Hapax in Each Book
 
 Hapax (count == 1) words by book:
@@ -249,7 +288,49 @@ book_hapax_words
 ## # … with 87,891 more rows
 ```
   
-Number of hapax per book.
+Number of hapax per book,
+combined with total number of words and number of unique words.
+
+
+```r
+book_hapax_words <- book_hapax_words |> group_by(title) |>
+  summarise(n_hapax = n()) |>
+  ungroup() |>
+  left_join(words_per_book, by="title") |>
+  mutate(percent_hapax_total = n_hapax / total_words * 100,
+    percent_hapax_unique = n_hapax / unique_words * 100)
+```
+
+```r
+knitr::kable(book_hapax_words, format.args=list(digits = 4))
+```
+
+
+
+|title                                                                              | n_hapax| total_words| unique_words| percent_hapax_total| percent_hapax_unique|
+|:----------------------------------------------------------------------------------|-------:|-----------:|------------:|-------------------:|--------------------:|
+|A Christmas Carol                                                                  |    2366|       10162|         3917|              23.283|                60.40|
+|A Tale of Two Cities                                                               |    4156|       46288|         9132|               8.979|                45.51|
+|Barnaby Rudge: A Tale of the Riots of 'Eighty                                      |    4921|       87155|        12467|               5.646|                39.47|
+|Bleak House                                                                        |    5820|      111535|        14656|               5.218|                39.71|
+|David Copperfield                                                                  |    5403|      108448|        13636|               4.982|                39.62|
+|Dombey and Son                                                                     |    5517|      122150|        14441|               4.517|                38.20|
+|Great Expectations                                                                 |    4515|       56130|        10183|               8.044|                44.34|
+|Hard Times                                                                         |    4147|       33740|         8194|              12.291|                50.61|
+|Little Dorrit                                                                      |    5704|      107682|        14411|               5.297|                39.58|
+|Martin Chuzzlewit                                                                  |    6085|      111748|        15046|               5.445|                40.44|
+|Nicholas Nickleby                                                                  |    5430|      113185|        14306|               4.797|                37.96|
+|Oliver Twist                                                                       |    4115|       56255|         9578|               7.315|                42.96|
+|Our Mutual Friend                                                                  |    5627|      108349|        14316|               5.193|                39.31|
+|The Battle of Life. A Love Story                                                   |    2341|       10552|         3872|              22.185|                60.46|
+|The Chimes
+A Goblin Story of Some Bells That Rang an Old Year out and a New Year In |    2240|       10355|         3728|              21.632|                60.09|
+|The Cricket on the Hearth                                                          |    2389|       10679|         3904|              22.371|                61.19|
+|The Haunted Man and the Ghost's Bargain                                            |    2316|       10757|         3847|              21.530|                60.20|
+|The Mystery of Edwin Drood                                                         |    4423|       32654|         8647|              13.545|                51.15|
+|The Old Curiosity Shop                                                             |    4667|       73959|        11406|               6.310|                40.92|
+|The Pickwick Papers                                                                |    5719|      114235|        14552|               5.006|                39.30|
+
 
 ```r
 book_hapax_words |> group_by(title) |>

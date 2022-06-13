@@ -110,6 +110,17 @@ book_word_counts <- words |>
 book_word_counts
 ```
 
+## Words Per Book
+```{r}
+words_per_book <- book_word_counts |>
+  group_by(title) |>
+  summarise(total_words = sum(n), unique_words = length(word))
+```
+
+```{r}
+words_per_book
+```
+
 ## Hapax in Each Book
 
 Hapax (count == 1) words by book:
@@ -124,7 +135,21 @@ nrow(book_hapax_words)
 book_hapax_words
 ```
   
-Number of hapax per book.
+Number of hapax per book,
+combined with total number of words and number of unique words.
+
+```{r combine_by_book}
+book_hapax_words <- book_hapax_words |> group_by(title) |>
+  summarise(n_hapax = n()) |>
+  ungroup() |>
+  left_join(words_per_book, by="title") |>
+  mutate(percent_hapax_total = n_hapax / total_words * 100,
+    percent_hapax_unique = n_hapax / unique_words * 100)
+```
+```{r}
+knitr::kable(book_hapax_words, format.args=list(digits = 4))
+```
+
 ```{r hapax_per_book}
 book_hapax_words |> group_by(title) |>
   summarise(Nhapax = n()) |>
