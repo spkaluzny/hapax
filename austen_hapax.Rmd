@@ -47,10 +47,10 @@ names(austen_works)
 austen_works[["title"]]
 ```
 
-Only look at individual Austen's novels:
+Only look at individual adult Austen's novels:
 
 ```{r only_novels}
-austen_works <- austen_works[-c(9:10),]
+austen_works <- austen_works[-c(7,9,10), ]
 austen_works[["title"]]
 ```
 
@@ -146,7 +146,6 @@ knitr::kable(book_hapax_words, format.args=list(digits = 4))
 
 ```{r hapax_per_book}
 book_hapax_words |> group_by(title) |>
-  summarise(n_hapax = n()) |>
   arrange(desc(n_hapax)) |>
   ggplot(aes(y=factor(title, levels=title), x=n_hapax)) +
     geom_point() +
@@ -154,6 +153,28 @@ book_hapax_words |> group_by(title) |>
     ggtitle("Number of Hapaxes in Each Austen Novel") +
     ylab("Title") +
     xlab("Number of Hapaxes")
+```
+
+```{r hapax_percent_words}
+book_hapax_words |> group_by(title) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=percent_hapax_total)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=percent_hapax_total, y=title, yend=title)) +
+    ggtitle("Percent Hapaxes of Words in Each Austen Novel") +
+    ylab("Title") +
+    xlab("Percent Hapaxes of Words")
+```
+
+```{r hapax_percent_unique_words}
+book_hapax_words |> group_by(title) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=percent_hapax_unique)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=percent_hapax_unique, y=title, yend=title)) +
+    ggtitle("Percent Hapaxes of Unique Words in Each Austen Novel") +
+    ylab("Title") +
+    xlab("Percent Hapaxes of Unique Words")
 ```
 
 ## Hapax for All Austen Works

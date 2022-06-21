@@ -82,6 +82,20 @@ names(dickens_books)
 dickens_books
 ```
 
+We shorten some of the longer titles to make displaying of results better.
+
+```{r title_shorten}
+dickens_books[["title"]] <- ifelse(
+  dickens_books[["title"]] == "The Haunted Man and the Ghost's Bargain",
+  "The Haunted Man", dickens_books[["title"]])
+dickens_books[["title"]] <- ifelse(
+  dickens_books[["title"]] == "Barnaby Rudge: A Tale of the Riots of 'Eighty",
+  "Barnaby Rudge", dickens_books[["title"]])
+dickens_books[["title"]] <- ifelse(
+  dickens_books[["title"]] == "The Chimes\r\nA Goblin Story of Some Bells That Rang an Old Year out and a New Year In",
+  "The Chimes", dickens_books[["title"]])
+```
+
 # Word Analysis
 
 Get words in each book,
@@ -152,14 +166,35 @@ knitr::kable(book_hapax_words, format.args=list(digits = 4))
 
 ```{r hapax_per_book}
 book_hapax_words |> group_by(title) |>
-  summarise(Nhapax = n()) |>
-  arrange(desc(Nhapax)) |>
-  ggplot(aes(y=factor(title, levels=title), x=Nhapax)) +
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=n_hapax)) +
     geom_point() +
-    geom_segment(aes(x=0, xend=Nhapax, y=title, yend=title)) +
+    geom_segment(aes(x=0, xend=n_hapax, y=title, yend=title)) +
     ggtitle("Number of Hapaxes in Each Dickens Novel") +
     ylab("Title") +
     xlab("Number of Hapaxes")
+```
+
+```{r hapax_percent_words}
+book_hapax_words |> group_by(title) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=percent_hapax_total)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=percent_hapax_total, y=title, yend=title)) +
+    ggtitle("Percent Hapaxes of Words in Each Dickens Novel") +
+    ylab("Title") +
+    xlab("Percent Hapaxes of Words")
+```
+
+```{r hapax_percent_unique_words}
+book_hapax_words |> group_by(title) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=percent_hapax_unique)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=percent_hapax_unique, y=title, yend=title)) +
+    ggtitle("Percent Hapaxes of Unique Words in Each Dickens Novel") +
+    ylab("Title") +
+    xlab("Percent Hapaxes of Unique Words")
 ```
 
 ## Hapax for All Dickens Works

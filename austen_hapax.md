@@ -1,7 +1,7 @@
 ---
 title: "Jane Austen Hapax"
 author: "Stephen Kaluzny"
-date: "03 June, 2022"
+date: "15 June, 2022"
 output:
   html_document:
     keep_md: yes
@@ -79,19 +79,18 @@ austen_works[["title"]]
 ## [10] "The Letters of Jane Austen\r\nSelected from the compilation of her great nephew, Edward, Lord Bradbourne"
 ```
 
-Only look at individual Austen's novels:
+Only look at individual adult Austen's novels:
 
 
 ```r
-austen_works <- austen_works[-c(9:10),]
+austen_works <- austen_works[-c(7,9,10), ]
 austen_works[["title"]]
 ```
 
 ```
-## [1] "Persuasion"                "Northanger Abbey"         
-## [3] "Mansfield Park"            "Emma"                     
-## [5] "Sense and Sensibility"     "Lady Susan"               
-## [7] "Love and Freindship [sic]" "Pride and Prejudice"
+## [1] "Persuasion"            "Northanger Abbey"      "Mansfield Park"       
+## [4] "Emma"                  "Sense and Sensibility" "Lady Susan"           
+## [7] "Pride and Prejudice"
 ```
 
 
@@ -109,7 +108,7 @@ nrow(austen_books)
 ```
 
 ```
-## [1] 81275
+## [1] 77874
 ```
 
 ```r
@@ -125,7 +124,7 @@ austen_books
 ```
 
 ```
-## # A tibble: 81,275 × 3
+## # A tibble: 77,874 × 3
 ##    gutenberg_id text          title     
 ##           <int> <chr>         <chr>     
 ##  1          105 "Persuasion"  Persuasion
@@ -138,7 +137,7 @@ austen_books
 ##  8          105 "(1818)"      Persuasion
 ##  9          105 ""            Persuasion
 ## 10          105 ""            Persuasion
-## # … with 81,265 more rows
+## # … with 77,864 more rows
 ```
 
 # Word Analysis
@@ -160,7 +159,7 @@ nrow(words)
 ```
 
 ```
-## [1] 782299
+## [1] 748740
 ```
 
 ```r
@@ -168,7 +167,7 @@ words
 ```
 
 ```
-## # A tibble: 782,299 × 3
+## # A tibble: 748,740 × 3
 ##    gutenberg_id title      word      
 ##           <int> <chr>      <chr>     
 ##  1          105 Persuasion persuasion
@@ -181,7 +180,7 @@ words
 ##  8          105 Persuasion sir       
 ##  9          105 Persuasion walter    
 ## 10          105 Persuasion elliot    
-## # … with 782,289 more rows
+## # … with 748,730 more rows
 ```
 
 Count words per book, dropping "stop" words first.
@@ -198,7 +197,7 @@ book_word_counts
 ```
 
 ```
-## # A tibble: 42,326 × 3
+## # A tibble: 38,608 × 3
 ##    title                 word          n
 ##    <chr>                 <chr>     <int>
 ##  1 Mansfield Park        fanny       925
@@ -211,7 +210,7 @@ book_word_counts
 ##  8 Emma                  harriet     506
 ##  9 Northanger Abbey      catherine   487
 ## 10 Persuasion            anne        447
-## # … with 42,316 more rows
+## # … with 38,598 more rows
 ```
 ## Words Per Book
 
@@ -227,17 +226,16 @@ words_per_book
 ```
 
 ```
-## # A tibble: 8 × 3
-##   title                     total_words unique_words
-##   <chr>                           <int>        <int>
-## 1 Emma                            46549         6565
-## 2 Lady Susan                       7157         2495
-## 3 Love and Freindship [sic]       11209         3718
-## 4 Mansfield Park                  47466         7220
-## 5 Northanger Abbey                23816         5495
-## 6 Persuasion                      25487         5303
-## 7 Pride and Prejudice             37010         5736
-## 8 Sense and Sensibility           36388         5794
+## # A tibble: 7 × 3
+##   title                 total_words unique_words
+##   <chr>                       <int>        <int>
+## 1 Emma                        46549         6565
+## 2 Lady Susan                   7157         2495
+## 3 Mansfield Park              47466         7220
+## 4 Northanger Abbey            23816         5495
+## 5 Persuasion                  25487         5303
+## 6 Pride and Prejudice         37010         5736
+## 7 Sense and Sensibility       36388         5794
 ```
 
 ## Hapax in Each Book
@@ -256,7 +254,7 @@ nrow(book_hapax_words)
 ```
 
 ```
-## [1] 18773
+## [1] 16808
 ```
 
 ```r
@@ -264,20 +262,20 @@ book_hapax_words
 ```
 
 ```
-## # A tibble: 18,773 × 3
-##    title                     word          n
-##    <chr>                     <chr>     <int>
-##  1 Persuasion                a'n't         1
-##  2 Sense and Sensibility     abandoned     1
-##  3 Love and Freindship [sic] abashed       1
-##  4 Mansfield Park            abashed       1
-##  5 Mansfield Park            abatement     1
-##  6 Northanger Abbey          abatement     1
-##  7 Pride and Prejudice       abatement     1
-##  8 Sense and Sensibility     abatement     1
-##  9 Mansfield Park            abating       1
-## 10 Mansfield Park            abbey         1
-## # … with 18,763 more rows
+## # A tibble: 16,808 × 3
+##    title                 word          n
+##    <chr>                 <chr>     <int>
+##  1 Persuasion            a'n't         1
+##  2 Sense and Sensibility abandoned     1
+##  3 Mansfield Park        abashed       1
+##  4 Mansfield Park        abatement     1
+##  5 Northanger Abbey      abatement     1
+##  6 Pride and Prejudice   abatement     1
+##  7 Sense and Sensibility abatement     1
+##  8 Mansfield Park        abating       1
+##  9 Mansfield Park        abbey         1
+## 10 Sense and Sensibility abbeyland     1
+## # … with 16,798 more rows
 ```
   
 Number of hapaxes per book,
@@ -299,21 +297,19 @@ knitr::kable(book_hapax_words, format.args=list(digits = 4))
 
 
 
-|title                     | n_hapax| total_words| unique_words| percent_hapax_total| percent_hapax_unique|
-|:-------------------------|-------:|-----------:|------------:|-------------------:|--------------------:|
-|Emma                      |    2707|       46549|         6565|               5.815|                41.23|
-|Lady Susan                |    1410|        7157|         2495|              19.701|                56.51|
-|Love and Freindship [sic] |    1965|       11209|         3718|              17.531|                52.85|
-|Mansfield Park            |    2966|       47466|         7220|               6.249|                41.08|
-|Northanger Abbey          |    2577|       23816|         5495|              10.820|                46.90|
-|Persuasion                |    2482|       25487|         5303|               9.738|                46.80|
-|Pride and Prejudice       |    2326|       37010|         5736|               6.285|                40.55|
-|Sense and Sensibility     |    2340|       36388|         5794|               6.431|                40.39|
+|title                 | n_hapax| total_words| unique_words| percent_hapax_total| percent_hapax_unique|
+|:---------------------|-------:|-----------:|------------:|-------------------:|--------------------:|
+|Emma                  |    2707|       46549|         6565|               5.815|                41.23|
+|Lady Susan            |    1410|        7157|         2495|              19.701|                56.51|
+|Mansfield Park        |    2966|       47466|         7220|               6.249|                41.08|
+|Northanger Abbey      |    2577|       23816|         5495|              10.820|                46.90|
+|Persuasion            |    2482|       25487|         5303|               9.738|                46.80|
+|Pride and Prejudice   |    2326|       37010|         5736|               6.285|                40.55|
+|Sense and Sensibility |    2340|       36388|         5794|               6.431|                40.39|
 
 
 ```r
 book_hapax_words |> group_by(title) |>
-  summarise(n_hapax = n()) |>
   arrange(desc(n_hapax)) |>
   ggplot(aes(y=factor(title, levels=title), x=n_hapax)) +
     geom_point() +
@@ -324,6 +320,34 @@ book_hapax_words |> group_by(title) |>
 ```
 
 ![](austen_hapax_files/figure-html/hapax_per_book-1.png)<!-- -->
+
+
+```r
+book_hapax_words |> group_by(title) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=percent_hapax_total)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=percent_hapax_total, y=title, yend=title)) +
+    ggtitle("Percent Hapaxes of Words in Each Austen Novel") +
+    ylab("Title") +
+    xlab("Percent Hapaxes of Words")
+```
+
+![](austen_hapax_files/figure-html/hapax_percent_words-1.png)<!-- -->
+
+
+```r
+book_hapax_words |> group_by(title) |>
+  arrange(desc(n_hapax)) |>
+  ggplot(aes(y=factor(title, levels=title), x=percent_hapax_unique)) +
+    geom_point() +
+    geom_segment(aes(x=0, xend=percent_hapax_unique, y=title, yend=title)) +
+    ggtitle("Percent Hapaxes of Unique Words in Each Austen Novel") +
+    ylab("Title") +
+    xlab("Percent Hapaxes of Unique Words")
+```
+
+![](austen_hapax_files/figure-html/hapax_percent_unique_words-1.png)<!-- -->
 
 ## Hapax for All Austen Works
 
@@ -343,7 +367,7 @@ nrow(works_hapax_words)
 ```
 
 ```
-## [1] 4617
+## [1] 4369
 ```
 
 A sample of hapaxes across all of Austen's works:from Austen's works:
@@ -354,14 +378,17 @@ sample(works_hapax_words[["word"]], 50)
 ```
 
 ```
-##  [1] "morley"       "thoroughfare" "lefroy"       "dew"          "drakes"      
-##  [6] "chilling"     "incompetency" "sublime"      "bely"         "undirected"  
-## [11] "supped"       "havoc"        "coze"         "crushed"      "decently"    
-## [16] "identify"     "tack"         "corrective"   "superfine"    "augmenting"  
-## [21] "brickbat"     "imprudently"  "banking"      "sweetmeats"   "magnificence"
-## [26] "smoking"      "contusion"    "deafer"       "faintly"      "jeffereys"   
-## [31] "minister"     "richard's"    "portmanteau"  "commandingly" "curls"       
-## [36] "remarked"     "chestnut"     "unseasonably" "unbiassed"    "enrolled"    
-## [41] "vulnerable"   "packs"        "default"      "busiest"      "abydos"      
-## [46] "wording"      "aisles"       "informality"  "emphatic"     "freak"
+##  [1] "ostentatiously"   "unguardedly"      "merrier"          "discreditable"   
+##  [5] "easton"           "claret"           "interposing"      "translate"       
+##  [9] "beset"            "warrior"          "tumbler"          "hursts"          
+## [13] "crow's"           "daggers"          "delicacies"       "indiscriminating"
+## [17] "uncensured"       "courts"           "tripping"         "auxiliary"       
+## [21] "broth"            "inspiration"      "baronight"        "unadvisable"     
+## [25] "moralize"         "supercilious"     "cot"              "defeat"          
+## [29] "flogging"         "locks"            "nun"              "shipwreck"       
+## [33] "rashness"         "comprehends"      "dawning"          "sanguinely"      
+## [37] "circumventing"    "voted"            "executor"         "poems"           
+## [41] "depose"           "cameos"           "acacia"           "wool"            
+## [45] "al"               "jilted"           "errant"           "glimmer"         
+## [49] "vagaries"         "stationing"
 ```
